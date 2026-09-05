@@ -1,0 +1,35 @@
+from langchain.tools import tool
+from tools.text import prepare_file_content
+from tools.paths import resolve_work_path
+
+@tool
+def write_file (path: str, content: str) -> str:
+    """
+    Create or overwrite a UTF-8 text file in the working directory.
+    
+    Works for any text file (.js, .java, .cpp, .py etc)
+    `content` is the full file body with real new line characters between lines. 
+    Do not wrap it in markdown fence. Do not encode line breaks as the two-character backslash-n.
+    
+    Args:
+        path: Relative path of the file to create/overwrite (e.g. "README.md")
+        content: Full file body with real new lines. No markdown fence. No backslash-n encoding
+    
+    """
+    if not path:
+        return "Error: Path is required"
+    
+    content = prepare_file_content (path, content)
+    
+    try:
+        file_path = resolve_work_path (path)
+    except ValueError as err:
+        return f"Error: Path escapes the working directory: {err}"
+    
+    try:
+        file_path.parent.mkdir (parents=True, exist_ok=True)
+        file_path.write_text (content, encoding="utf-8")
+    except Exception as err:
+        return f"Error: Failed to write file {path!r}: {err}"
+    
+    return f"File {path!r} written successfully"
