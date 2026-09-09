@@ -88,3 +88,7 @@ class ProtectionMiddleware (AgentMiddleware):
             return _tool_message (request, reason)
         
         return handler(request)
+    
+def build_protection_middleware() -> ProtectionMiddleware:
+    """Factory function to instantiate the audit middleware."""
+    return ProtectionMiddleware ()

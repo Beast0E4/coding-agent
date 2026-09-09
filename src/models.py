@@ -1,6 +1,9 @@
 import os
 from dataclasses import dataclass
 from langchain_groq import ChatGroq
+from dotenv import load_dotenv
+
+load_dotenv ()
 
 @dataclass (frozen = True)
 class Provider:
@@ -16,7 +19,7 @@ PROVIDERS = [
         "GROQ_API_KEY",
         True,
         None, 
-        "GROQ_MODEL"
+        os.getenv ("GROQ_MODEL")
     )
 ]
 

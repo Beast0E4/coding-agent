@@ -1,6 +1,6 @@
 from langchain.agents.middleware import HumanInTheLoopMiddleware
 
-def built_hitl_middleware () -> HumanInTheLoopMiddleware:
+def build_hitl_middleware () -> HumanInTheLoopMiddleware:
     """
         Middleware for Human in the Loop ability
     """
