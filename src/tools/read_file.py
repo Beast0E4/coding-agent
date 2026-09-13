@@ -13,13 +13,13 @@ def read_file (path: str) -> str:
     try:
         file_path = resolve_work_path (path)
     except ValueError as err:
-        raise ValueError (f"Path escapes working directory: {err}")
+        return f"Path escapes working directory: {err}"
     
     try:
         return file_path.read_text (encoding="utf-8")
     except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {path}")
+        return f"File not found: {path}"
     except PermissionError:
-        raise PermissionError (f"Permission denied: {path}")
+        return f"Permission denied: {path}"
     except Exception as err:
-        raise Exception (f"Error reading file: {err}")
+        return f"Error reading file: {err}"

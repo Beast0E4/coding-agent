@@ -34,6 +34,8 @@ def _deny_reason (tool_name: str, arguments: dict[str, Any]) -> str | None:
     """
     Returns a denial reason or none for a tool called being referred
     """
+    if tool_name == "run_command":
+        return None
     
     if tool_name not in FILE_TOOLS:
         return None
