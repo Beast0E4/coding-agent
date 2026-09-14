@@ -1,4 +1,4 @@
-# Coding Agent
+# Coding Agent (MVP - 1)
 
 The Coding Agent is an interactive, locally-running AI coding assistant built using LangChain and LangGraph. The agent reads, lists, and writes real files to a designated workspace directory and executes shell commands and background servers on the host machine. It features a robust middleware stack that enforces model-call limits, generates comprehensive audit logs, applies payload guardrails, and requires Human-in-the-Loop (HITL) execution for state-changing actions.
 
