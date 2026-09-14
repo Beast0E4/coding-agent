@@ -27,7 +27,7 @@ def build_middleware (
     layers : list = [
         ModelCallLimitMiddleware (
             run_limit=MAX_MODEL_RUNS_PER_RUN,
-            exit_behavior="exit"
+            exit_behavior="end"
         ),
         build_audit_middleware (),
         build_protection_middleware ()
@@ -51,7 +51,6 @@ def build_agent (
         model=model,
         tools=ALL_TOOLS,
         system_prompt=build_system_prompt (),
-        extra_guidance="",
         middleware=build_middleware (enable_hitl=use_hitl),
         checkpointer=checkpointer or make_checkpointer (),
         response_format=ProviderStrategy (TurnSummary),

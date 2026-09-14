@@ -1,3 +1,4 @@
+from pathlib import Path
 import re
 import os
 import sys
@@ -84,7 +85,8 @@ def looks_like_server (command: str) -> bool:
     return any (re.search (pattern, command, flags=re.IGNORECASE) for pattern in SERVER_PATTERNS)
 
 def rewrite_command (command: str) -> str:
-    exe = shlex.quote (sys.executable)
+    posix_exe = Path(sys.executable).as_posix()
+    exe = shlex.quote (posix_exe)
     
     stripped = command.strip ()
     
@@ -114,7 +116,7 @@ def run_foreground (command: str, timeout: int) -> str:
     
     try:
         completed = subprocess.run (
-            ["/bin/bash", "-lc", command],
+            ["powershell.exe", "-Command", command],
             cwd=cwd,
             env=env,
             capture_output=True,
@@ -138,7 +140,7 @@ def run_foreground (command: str, timeout: int) -> str:
     body = "\n".join (chunks) if chunks else "No output"
     return f"exit_code={completed.returncode}\ncwd={cwd}\n_{clip (body)}"
 
-def run_background (command: str, timeout: int) -> str:
+def run_background (command: str) -> str:
     cwd = get_work_directory ()
     cwd.mkdir (parents=True, exist_ok=True)
     
@@ -149,12 +151,14 @@ def run_background (command: str, timeout: int) -> str:
     log_dir.mkdir (parents=True, exist_ok=True)
     
     stamp = now_iso ().replace (":", "").replace ("+", "")
-    tmp_log = log_dir / f"pending-{stamp}.log"
-    log_file = tmp_log.open ("w", encoding="utf-8")
+    
+    # FIX: Define the final log path immediately using the timestamp instead of the PID
+    log_path = log_dir / f"job-{stamp}.log"
+    log_file = log_path.open ("w", encoding="utf-8")
     
     try:
         proc = subprocess.Popen (
-            ["/bin/bash", "-lc", command],
+            ["powershell.exe", "-Command", command],
             cwd=cwd,
             env=env,
             stdout=log_file,
@@ -164,14 +168,13 @@ def run_background (command: str, timeout: int) -> str:
     finally:
         log_file.close ()
     
+    # FIX: Removed tmp_log.rename(log_path) so Windows doesn't throw WinError 32
     
-    log_path = log_dir / f"{proc.pid}.log"
-    tmp_log.rename (log_path)
     register (
         BackgroundJob (
             pid=proc.pid,
             command=command,
-            log_path=log_path,
+            log_path=log_path, # Registers with the timestamped filename
             started_at=now_iso (),
             proc=proc
         )
@@ -196,7 +199,7 @@ def run_background (command: str, timeout: int) -> str:
         f"{url_line}\n"
         f"Started background job pid = {proc.pid}\n"
         f"Log: {log_path}\n"
-        f"cwd = {cwd}"
+        f"cwd = {cwd}\n"
         f"Use list_jobs/stop_jobs to manage it.\n"
         f"----------- OUTPUT SO FAR ----------- \n{clip (tail)}"
     )

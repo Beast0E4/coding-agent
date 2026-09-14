@@ -66,7 +66,7 @@ def _deny_reason (tool_name: str, arguments: dict[str, Any]) -> str | None:
         
     if payload:
         for pattern in BLOCKED_EDIT_PATTERNS:
-            if re.search (pattern=payload):
+            if re.search (pattern, payload):
                 return (
                     f"Blocked by middleware : suspicious payload contains {pattern!r}"
                 )
@@ -84,7 +84,7 @@ class ProtectionMiddleware (AgentMiddleware):
         name = request.tool_call.get ('name', "")
         arguments = request.tool_call.get ('args', {})
         
-        reason = _deny_reason
+        reason = _deny_reason (name, arguments)
         
         if reason is not None:
             return _tool_message (request, reason)

@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from langchain_groq import ChatGroq
+from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
 load_dotenv ()
@@ -15,11 +15,11 @@ class Provider:
     
 PROVIDERS = [
     Provider (
-        "Groq",
-        "GROQ_API_KEY",
-        True,
+        "OpenAI",
+        "OPENAI_API_KEY",
+        False,
         None, 
-        os.getenv ("GROQ_MODEL")
+        os.getenv ("OPENAI_MODEL")
     )
 ]
 
@@ -30,7 +30,7 @@ def select_provider () -> Provider:
         
     raise RuntimeError ("No providers present")
 
-def build_chat_model () -> tuple[ChatGroq, Provider]:
+def build_chat_model () -> tuple[ChatOpenAI, Provider]:
     provider = select_provider ()
     kwargs: dict = {
         "model": provider.model,
@@ -40,4 +40,4 @@ def build_chat_model () -> tuple[ChatGroq, Provider]:
     if provider.base_url is not None:
         kwargs["base_url"] = provider.base_url
         
-    return ChatGroq (**kwargs), provider
+    return ChatOpenAI (**kwargs), provider
